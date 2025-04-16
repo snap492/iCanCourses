@@ -1,0 +1,42 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3179.45" />
+  </ItemGroup>
+    <!-- Сборка React-приложения до сборки WPF -->
+  <Target Name="BuildReactApp" BeforeTargets="Build">
+    <Message Importance="high" Text="🔧 Сборка React-приложения..." />
+    <Exec WorkingDirectory="$(SolutionDir)i-can-courses-frontend" Command="npm install" />
+    <Exec WorkingDirectory="$(SolutionDir)i-can-courses-frontend" Command="npm run build" />
+  </Target>
+
+  <!-- Копирование результата сборки React в wwwroot -->
+  <Target Name="CopyReactBuildToWwwRoot" AfterTargets="Build">
+    <Message Importance="high" Text="📁 Копирование React-сборки в wwwroot..." />
+    <RemoveDir Directories="$(ProjectDir)wwwroot" />
+    <MakeDir Directories="$(ProjectDir)wwwroot" />
+    <Copy SourceFiles="@(ReactDistFiles)" DestinationFolder="$(ProjectDir)wwwroot\%(RecursiveDir)" />
+  </Target>
+  
+	<ItemGroup>
+		<ReactDistFiles Include="$(SolutionDir)i-can-courses-frontend\dist\**\*" />
+	</ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\" />
+  </ItemGroup>
+	<ItemGroup>
+		<Content Include="wwwroot\**\*">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+
+</Project>
