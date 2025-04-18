@@ -42,11 +42,12 @@ export default function LexiaEditor() {
                 <RichTextPlugin
                     contentEditable={
                         <ContentEditable
-                            className="editor-input editor-container"
+                            className="editor-container"
                             style={{
                                 display: "flex",
                                 flexDirection: "column",
                                 gap: "8px",
+                                marginLeft: "20px",
                             }}
                         />
                     }

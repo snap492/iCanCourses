@@ -1,10 +1,14 @@
 ﻿import { useState, useEffect, useRef } from "react";
 import ReactDOM from "react-dom";
+interface BlockHoverToolbarProps {
+    hoveredNode: { key: string; element: HTMLElement } | null;
+   
+}
 
-export const BlockHoverToolbar = ({ hoveredNode }: { hoveredNode: { key: string, element: HTMLElement } | null }) => {
+export const BlockHoverToolbar = ({ hoveredNode }: BlockHoverToolbarProps) => {
     const [blockPosition, setBlockPosition] = useState<{ top: number; left: number; height: number } | null>(null);
     const [visible, setVisible] = useState(false);
-    const [rendered, setRendered] = useState(false); // чтобы держать DOM для плавного скрытия
+    const [rendered, setRendered] = useState(false);
     const toolbarRef = useRef<HTMLDivElement>(null);
     const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -76,10 +80,9 @@ export const BlockHoverToolbar = ({ hoveredNode }: { hoveredNode: { key: string,
         };
     }, [hoveredNode]);
 
-    // Когда панель полностью скрыта, убираем её из DOM
     useEffect(() => {
         if (!visible) {
-            const timeout = setTimeout(() => setRendered(false), 300); // Подождать окончания transition
+            const timeout = setTimeout(() => setRendered(false), 300);
             return () => clearTimeout(timeout);
         } else {
             setRendered(true);
@@ -87,18 +90,19 @@ export const BlockHoverToolbar = ({ hoveredNode }: { hoveredNode: { key: string,
     }, [visible]);
 
     if (!hoveredNode || !blockPosition || !rendered) return null;
-
-    return ReactDOM.createPortal(
+  
+    // Add a new block below the hovered block
+        return ReactDOM.createPortal(
         <div
             ref={toolbarRef}
             className={`block-hover-toolbar ${visible ? "visible" : ""}`}
             style={{
-                top: blockPosition.top + window.scrollY + blockPosition.height / 2 - 20,
-                left: blockPosition.left - 32,
+                top: blockPosition.top + blockPosition.height / 2,
+                left: blockPosition.left - 50,
             }}
         >
-            <button>＋</button>
-            <button>⠿</button>
+            <button >＋</button>
+            <button >⠿</button>
         </div>,
         document.body
     );

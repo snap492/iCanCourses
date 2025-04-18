@@ -1,5 +1,4 @@
-import { ParagraphNode, SerializedParagraphNode, Spread } from "lexical";
-import { ReactNode } from "react";
+import { ParagraphNode } from "lexical";
 
 export class CustomParagraphNode extends ParagraphNode {
     static getType(): string {

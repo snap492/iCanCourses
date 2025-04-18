@@ -1,5 +1,5 @@
 ﻿import { useEffect } from "react";
-import { $getNearestNodeFromDOMNode, LexicalEditor } from "lexical";
+import { $getNearestNodeFromDOMNode } from "lexical";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 
 
