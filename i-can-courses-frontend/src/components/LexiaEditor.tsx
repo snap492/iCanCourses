@@ -40,9 +40,7 @@ export default function LexiaEditor() {
                 setBlockType={handleBlockTypeChange}
                 activeId={activeId}
                 setActiveId={setActiveId}
-            />
-            <BlockHoverToolbar hoveredNode={hoveredNode} />
-            <BlockTypeSelector onChange={handleBlockTypeChange} />
+            />        
         </LexicalComposer>
     );
 }
