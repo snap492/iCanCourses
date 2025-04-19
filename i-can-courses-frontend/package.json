@@ -23,8 +23,7 @@
     "lexical": "^0.30.0",
     "lucide-react": "^0.488.0",
     "react": "^19.0.0",
-    "react-dom": "^19.1.0",
-    "slate-history": "^0.113.1",
+    "react-dom": "^19.1.0",    
     "tailwindcss": "^4.1.4",
     "uuid": "^11.1.0"
   },
