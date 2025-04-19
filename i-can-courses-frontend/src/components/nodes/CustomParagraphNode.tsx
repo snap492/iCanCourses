@@ -1,6 +1,10 @@
-import { ParagraphNode } from "lexical";
+import { DecoratorNode, LexicalEditor, NodeKey, SerializedLexicalNode, EditorConfig } from "lexical";
+import * as React from "react";
+import { JSX } from "react";
 
-export class CustomParagraphNode extends ParagraphNode {
+type SerializedCustomParagraphNode = SerializedLexicalNode;
+
+export class CustomParagraphNode extends DecoratorNode<JSX.Element> {
     static getType(): string {
         return "custom-paragraph";
     }
@@ -9,21 +13,32 @@ export class CustomParagraphNode extends ParagraphNode {
         return new CustomParagraphNode(node.__key);
     }
 
-    createDOM(): HTMLElement {
-        const dom = document.createElement("div");
-        dom.className = "editor-block";
-        return dom;
+    constructor(key?: NodeKey) {
+        super(key);
     }
 
-    updateDOM(): boolean {
+    createDOM(config: EditorConfig, editor: LexicalEditor): HTMLElement {
+        const div = document.createElement("div");
+        div.className = "custom-paragraph";
+        return div;
+    }
+
+    updateDOM(prevNode: CustomParagraphNode, dom: HTMLElement): boolean {
         return false;
     }
-}
 
-export function $createCustomParagraphNode(): CustomParagraphNode {
-    return new CustomParagraphNode();
-}
+    decorate(): JSX.Element {
+        return <div>Пустой параграф</div>;
+    }
 
-export function $isCustomParagraphNode(node: unknown): node is CustomParagraphNode {
-    return node instanceof CustomParagraphNode;
+    static importJSON(serializedNode: SerializedCustomParagraphNode): CustomParagraphNode {
+        return new CustomParagraphNode();
+    }
+
+    exportJSON(): SerializedCustomParagraphNode {
+        return {
+            type: "custom-paragraph",
+            version: 1,
+        };
+    }
 }

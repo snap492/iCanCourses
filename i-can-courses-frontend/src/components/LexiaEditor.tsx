@@ -1,18 +1,13 @@
-import { useCallback, useState } from "react";
+import { useState, useCallback } from "react";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
-import { ContentEditable } from "@lexical/react/LexicalContentEditable";
-import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
-import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
-import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
-import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
-
 import { CustomParagraphNode } from "./nodes/CustomParagraphNode";
 import { TextNode } from "lexical";
-import BlockHoverPlugin from "./plugins/BlockHoverPlugin";
 
-import "./LexiaEditor.css";
 import { BlockHoverToolbar } from "./ui/BlockHoverToolbar";
 import BlockTypeSelector from "./ui/BlockTypeSelector";
+
+import "./LexiaEditor.css";
+import { EditorContent } from "./EditorContent"; // 👈 Новый файл!
 
 const editorConfig = {
     namespace: "LexiaEditor",
@@ -20,44 +15,32 @@ const editorConfig = {
     onError(error: any) {
         console.error(error);
     },
-    nodes: [
-        CustomParagraphNode,
-        TextNode,
-    ],
+    nodes: [CustomParagraphNode, TextNode],
 };
 
 export default function LexiaEditor() {
     const [hoveredNode, setHoveredNode] = useState<null | { key: string; element: HTMLElement }>(null);
     const [blockType, setBlockType] = useState("paragraph");
+    const [activeId, setActiveId] = useState<string | null>(null);
 
     const handleHoverNode = useCallback((node: { key: string; element: HTMLElement } | null) => {
         setHoveredNode(node);
     }, []);
+
     const handleBlockTypeChange = (type: string) => {
         setBlockType(type);
     };
+
     return (
         <LexicalComposer initialConfig={editorConfig}>
-            <div className="editor-container">
-                <RichTextPlugin
-                    contentEditable={
-                        <ContentEditable
-                            className="editor-container"
-                            style={{
-                                display: "flex",
-                                flexDirection: "column",
-                                gap: "8px",
-                                marginLeft: "20px",
-                            }}
-                        />
-                    }
-                    placeholder={<div>Начните писать...</div>}
-                    ErrorBoundary={LexicalErrorBoundary}
-                />
-                <HistoryPlugin />
-                <OnChangePlugin onChange={(editorState) => { }} />
-                <BlockHoverPlugin onHoverNode={handleHoverNode} />               
-            </div>
+            <EditorContent
+                hoveredNode={hoveredNode}
+                setHoveredNode={setHoveredNode}
+                blockType={blockType}
+                setBlockType={handleBlockTypeChange}
+                activeId={activeId}
+                setActiveId={setActiveId}
+            />
             <BlockHoverToolbar hoveredNode={hoveredNode} />
             <BlockTypeSelector onChange={handleBlockTypeChange} />
         </LexicalComposer>

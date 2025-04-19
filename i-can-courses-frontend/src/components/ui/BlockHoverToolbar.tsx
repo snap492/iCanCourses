@@ -98,7 +98,7 @@ export const BlockHoverToolbar = ({ hoveredNode }: BlockHoverToolbarProps) => {
             className={`block-hover-toolbar ${visible ? "visible" : ""}`}
             style={{
                 top: blockPosition.top + blockPosition.height / 2,
-                left: blockPosition.left - 50,
+                left: blockPosition.left - 40,
             }}
         >
             <button >＋</button>

@@ -1,17 +1,52 @@
-@import "tailwindcss";  
-/* ��������� ��������� */
-.editor-container {
-    border: none;
-    padding: 0;
-    margin: 0;
-}
+﻿@import "tailwindcss";  
+/* Контейнер редактора */
+
 
     .editor-container:focus {
         outline: none; /* Remove default focus outline */
         border: none; /* Remove default border */
         box-shadow: none; /* Remove default box shadow */
     }
+.editor-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-left: 20px;
+    position: relative;
+    padding: 20px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
 
+.editor-content {
+    outline: none; /* ❌ убираем некрасивую рамку */
+    min-height: 200px;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    margin-left: 25px; /* Move right text block */
+}
+
+.editor-placeholder {
+    position: absolute;
+    top: 24px;
+    left: 44px;
+    color: #aaa;
+    pointer-events: none;
+    user-select: none;
+}
+
+.custom-paragraph {
+    padding: 8px 12px;
+    border-radius: 4px;
+    transition: background 0.2s;
+    position: relative;
+}
+
+    .custom-paragraph:hover {
+        background: #f0f0f0; /* мягкий hover-эффект */
+    }
 /* Block styles */
 
 .editor-block {
@@ -40,12 +75,12 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 4px;
+    gap: 1px;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.3s ease;
     top: 50%; /* Align vertically with the block */
-    left: -50px; /* Position to the left of the block */
+    left: -40px; /* Position to the left of the block */
     transform: translateY(-50%); /* Center vertically */
 }
 
@@ -59,7 +94,7 @@
 .block-hover-toolbar button {
     background: none;
     border: none;
-    padding: 4px;
+    padding: 1px;
     cursor: pointer;
     font-size: 16px;
     color: #555;
