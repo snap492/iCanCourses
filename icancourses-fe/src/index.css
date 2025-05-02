@@ -76,11 +76,34 @@ ul[data-type="taskList"] {
     @apply shadow-md; /* тень */
     @aply border-none; /* граница */
 }
-.tiptap .exit-hint {
-    border-bottom: 1px dashed #bbb;
-    padding-bottom: 4px;
-    margin-bottom: 4px;
+
+@layer utilities {
+    .exit-hint::before {
+        content: 'Нажмите Enter, чтобы выйти из колонки';
+        @apply pointer-events-none float-left h-0 text-base text-gray-500 italic;
+    }
 }
+@layer utilities{
+    /* Placeholder (at the top) */
+    p.is-editor-empty:first-child::before {
+        color: var(--gray-4);
+        content: attr(data-placeholder);
+        float: left;
+        height: 0;
+        pointer-events: none;
+    }
+}
+/*
+    .tiptap p.exit-hint:empty::before {
+        content: 'Нажмите Enter, чтобы выйти из колонки';
+        color: #999;
+        font-style: italic;
+        font-size: 12px;
+        pointer-events: none;
+    }
+*/
+
+
 /*:root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;

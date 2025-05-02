@@ -1,7 +1,6 @@
-﻿// ===src/extansions/Columns.ts ============
-
-import { Node, mergeAttributes, RawCommands, CommandProps } from '@tiptap/core';
-import { TextSelection, Plugin } from 'prosemirror-state';
+﻿// ===src/extensions/Columns.ts===========
+import { Node, mergeAttributes, RawCommands } from '@tiptap/core';
+import { Plugin, TextSelection } from 'prosemirror-state';
 import { Decoration, DecorationSet } from 'prosemirror-view';
 
 export const Columns = Node.create({
@@ -98,68 +97,46 @@ export const Columns = Node.create({
                     },
         } satisfies Partial<RawCommands>;
     },
+
     addProseMirrorPlugins() {
         return [
             new Plugin({
                 props: {
-                    decorations: ({ doc, selection, tr }) => {
-                        const decorations = [];
-                        const { $from } = selection;
+                    decorations: ({ doc }) => {
+                        const decorations: Decoration[] = [];
 
-                        // Находим глубину колонки
-                        let columnDepth = -1;
-                        for (let i = $from.depth; i >= 0; i--) {
-                            if ($from.node(i).type.name === 'column') {
-                                columnDepth = i;
-                                break;
-                            }
-                        }
+                        doc.descendants((node, pos) => {
+                            if (node.type.name !== 'column') return true;
 
-                        if (columnDepth === -1) return null;
+                            const last = node.lastChild;
+                            if (!last || last.type.name !== 'paragraph') return true;
+                            if (!isNodeEmpty(last)) return true;
 
-                        const columnNode = $from.node(columnDepth);
-                        const currentNode = $from.node();
+                            const lastParagraphPos = pos + 1 + node.content.size - last.nodeSize;
 
-                        // Проверяем, что текущий узел - это параграф
-                        if (currentNode.type.name !== 'paragraph') return null;
-
-                        // Проверяем, является ли параграф последним в колонке
-                        const isLastParagraph = columnNode.child(columnNode.childCount - 1) === currentNode;
-
-                        if (isLastParagraph) {
-                            const paragraphPos = $from.start($from.depth); // вместо $from.pos - currentNode.nodeSize
                             decorations.push(
-                                Decoration.node(
-                                    paragraphPos,
-                                    paragraphPos + currentNode.nodeSize,
-                                    {
-                                        class: [
-                                            'text-base',
-                                            'leading-6',
-                                            'text-gray-800',
-                                            'text-wrap',
-                                            'exit-hint'
-                                        ].join(' '),
-                                        style: 'outline: 1px solid red;',
-                                    }
-                                )
+                                Decoration.node(lastParagraphPos, lastParagraphPos + last.nodeSize, {
+                                    //'data-exit-hint': 'true',
+                                    class: " exit-hint ",
+                                })
                             );
-                        }
+
+                            return true;
+                        });
 
                         return DecorationSet.create(doc, decorations);
-                    }
-                }
-            })
-
+                    },
+                },
+            }),
         ];
     },
+
     addKeyboardShortcuts() {
         return {
             Enter: ({ editor }) => {
                 const { state } = editor;
                 const { $from } = state.selection;
 
-                // Проверка: есть ли в иерархии родитель columns
                 let insideColumns = false;
                 for (let i = $from.depth; i >= 0; i--) {
                     if ($from.node(i).type.name === 'columns') {
@@ -167,15 +144,10 @@ export const Columns = Node.create({
                         break;
                     }
                 }
+                if (!insideColumns) return false;
 
-                if (!insideColumns) {
-                    return false; // не в columns — не обрабатываем
-                }
-
-                // Проверка: находимся ли мы внутри column и columns
                 let columnDepth = -1;
                 let columnsDepth = -1;
-
                 for (let i = $from.depth; i >= 0; i--) {
                     const node = $from.node(i);
                     if (node.type.name === 'column' && columnDepth === -1) {
@@ -187,48 +159,38 @@ export const Columns = Node.create({
                     }
                 }
 
-                if (columnsDepth === -1 || columnDepth === -1) {
-                    return false;
-                }
+                if (columnsDepth === -1 || columnDepth === -1) return false;
 
                 const currentNode = $from.node();
                 const columnNode = $from.node(columnDepth);
 
-                if (currentNode.type.name !== 'paragraph') {
-                    return false;
-                }
+                if (currentNode.type.name !== 'paragraph') return false;
 
                 const isEmpty = isNodeEmpty(currentNode);
                 const isLastInColumn = columnNode.lastChild === currentNode;
 
                 if (isEmpty && isLastInColumn) {
-                    // Выход из блока columns                  
                     const posAfterColumns = $from.after(columnsDepth);
                     const tr = state.tr;
-
                     tr.insert(posAfterColumns, state.schema.nodes.paragraph.create());
                     tr.setSelection(TextSelection.near(tr.doc.resolve(posAfterColumns + 1)));
                     editor.view.dispatch(tr);
-
                     return true;
                 }
 
                 if (isEmpty && !isLastInColumn) {
-                    // Просто добавить новый параграф ниже внутри колонки
                     const tr = state.tr;
-                    const insertPos = $from.end(); // конец текущего параграфа
+                    const insertPos = $from.end();
                     tr.insert(insertPos, state.schema.nodes.paragraph.create());
                     tr.setSelection(TextSelection.near(tr.doc.resolve(insertPos + 1)));
                     editor.view.dispatch(tr);
-
                     return true;
                 }
 
                 return false;
             },
         };
-    }
-,
+    },
 });
 
 function isNodeEmpty(node: any): boolean {
