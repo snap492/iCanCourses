@@ -127,7 +127,7 @@ export const Columns = Node.create({
                         const isLastParagraph = columnNode.child(columnNode.childCount - 1) === currentNode;
 
                         if (isLastParagraph) {
-                            const paragraphPos = $from.pos - currentNode.nodeSize;
+                            const paragraphPos = $from.start($from.depth); // вместо $from.pos - currentNode.nodeSize
                             decorations.push(
                                 Decoration.node(
                                     paragraphPos,
@@ -139,7 +139,8 @@ export const Columns = Node.create({
                                             'text-gray-800',
                                             'text-wrap',
                                             'exit-hint'
-                                        ].join(' ')
+                                        ].join(' '),
+                                        style: 'outline: 1px solid red;',
                                     }
                                 )
                             );

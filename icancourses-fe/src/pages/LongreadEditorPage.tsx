@@ -10,7 +10,7 @@ import TextAlign from '@tiptap/extension-text-align';
 import Typography from '@tiptap/extension-typography';
 import BulletList from '@tiptap/extension-bullet-list';
 import OrderedList from '@tiptap/extension-ordered-list';   
-import Paragraph from '@tiptap/extension-paragraph';
+//import Paragraph from '@tiptap/extension-paragraph';
 import Underline from '@tiptap/extension-underline';
 import Strike from '@tiptap/extension-strike';
 import CodeBlock from '@tiptap/extension-code-block';
@@ -22,7 +22,7 @@ import ToolbarBubble from '../components/ToolbarBubble';
 import listItem from '@tiptap/extension-list-item'; 
 import { ICTaskListItem } from '../extensions/ICTaskListItem';  
 import { ICHeading } from '../extensions/ICHeading';
-//import {ICParagraph } from '../extensions/ICParagraph'
+import {ICParagraph } from '../extensions/ICParagraph'
 
 export default function LongreadEditorPage() {
     const [pages, setPages] = useState([{ id: 1, title: 'Страница 1' }]);
@@ -46,12 +46,12 @@ export default function LongreadEditorPage() {
                 blockquote: false,
             }),
             ICHeading,
-            Paragraph.configure({
-                HTMLAttributes: {
-                    class: 'text-base leading-6 text-gray-800 text-wrap',
-                },  
-            }) ,
-            //ICParagraph,
+            //Paragraph.configure({
+            //    HTMLAttributes: {
+            //        class: 'text-base leading-6 text-gray-800 text-wrap',
+            //    },  
+            //}) ,
+            ICParagraph,
             listItem,
             BulletList.configure({
                 HTMLAttributes: {
