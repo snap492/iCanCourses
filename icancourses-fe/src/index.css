@@ -76,7 +76,11 @@ ul[data-type="taskList"] {
     @apply shadow-md; /* тень */
     @aply border-none; /* граница */
 }
-
+.tiptap .exit-hint {
+    border-bottom: 1px dashed #bbb;
+    padding-bottom: 4px;
+    margin-bottom: 4px;
+}
 /*:root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;

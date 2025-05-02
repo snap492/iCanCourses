@@ -1,3 +1,5 @@
+// ===src/extansions/Column.ts ============
+
 import { Node, mergeAttributes } from '@tiptap/core';
 
 export const Column = Node.create({
@@ -24,5 +26,5 @@ export const Column = Node.create({
             }),
             0,
         ];
-    },
+    },    
 });

@@ -5,7 +5,7 @@ import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Image from '@tiptap/extension-image';
 import TaskList from '@tiptap/extension-task-list';
-import TaskItem from '@tiptap/extension-task-item';
+//import TaskItem from '@tiptap/extension-task-item';
 import TextAlign from '@tiptap/extension-text-align';
 import Typography from '@tiptap/extension-typography';
 import BulletList from '@tiptap/extension-bullet-list';
@@ -22,6 +22,7 @@ import ToolbarBubble from '../components/ToolbarBubble';
 import listItem from '@tiptap/extension-list-item'; 
 import { ICTaskListItem } from '../extensions/ICTaskListItem';  
 import { ICHeading } from '../extensions/ICHeading';
+//import {ICParagraph } from '../extensions/ICParagraph'
 
 export default function LongreadEditorPage() {
     const [pages, setPages] = useState([{ id: 1, title: 'Страница 1' }]);
@@ -35,7 +36,14 @@ export default function LongreadEditorPage() {
     const editor = useEditor({
         extensions: [
             StarterKit.configure({
-              
+                paragraph: false,
+                heading: false,
+                listItem: false,
+                bulletList: false,
+                orderedList: false,
+                strike: false,
+                codeBlock: false, 
+                blockquote: false,
             }),
             ICHeading,
             Paragraph.configure({
@@ -43,7 +51,7 @@ export default function LongreadEditorPage() {
                     class: 'text-base leading-6 text-gray-800 text-wrap',
                 },  
             }) ,
-            
+            //ICParagraph,
             listItem,
             BulletList.configure({
                 HTMLAttributes: {
@@ -331,6 +339,14 @@ export default function LongreadEditorPage() {
                         <ToolbarBubble
                             selectedLabel={columnsLabel}
                             options={[
+                                {
+                                    label: '1 колонка',
+                                    value: '1',
+                                    onClick: () => {
+                                        editor.chain().focus().removeColumns().run();
+                                        setColumnsLabel('1 колонка');
+                                    },
+                                },
                                 {
                                     label: '2 колонки',
                                     value: '2',
