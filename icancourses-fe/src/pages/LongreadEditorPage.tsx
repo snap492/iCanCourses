@@ -16,21 +16,30 @@ import Strike from '@tiptap/extension-strike';
 import CodeBlock from '@tiptap/extension-code-block';
 import Blockquote from '@tiptap/extension-blockquote';
 import { Placeholder } from '@tiptap/extension-placeholder'; 
+import listItem from '@tiptap/extension-list-item';
+
 import { Columns } from '../extensions/Columns';
 import { Column } from '../extensions/Column';
-
-import ToolbarBubble from '../components/ToolbarBubble';
-import listItem from '@tiptap/extension-list-item'; 
 import { ICTaskListItem } from '../extensions/ICTaskListItem';  
 import { ICHeading } from '../extensions/ICHeading';
 //import {ICParagraph } from '../extensions/ICParagraph'
 
+import ToolbarBubble from '../components/ToolbarBubble';
+
+import { FaAlignLeft, FaAlignCenter, FaAlignRight, FaListUl, FaListOl, FaTasks, FaRegSave, } from 'react-icons/fa';
+import { TbColumns1, TbColumns2, TbColumns3, TbColumns } from "react-icons/tb";
+import { LuHeading1, LuHeading2, LuHeading3, LuHeading4, LuHeading5, LuHeading6, LuBold, LuItalic, LuUnderline,
+         LuStrikethrough, LuCodeXml, LuMessageSquareQuote, LuHeading, LuImage } from "react-icons/lu";
+import { RiText } from "react-icons/ri";
+
 export default function LongreadEditorPage() {
     const [pages, setPages] = useState([{ id: 1, title: 'Страница 1' }]);
     const [currentPage, setCurrentPage] = useState(1);
-    const [listLabel, setListLabel] = useState('Списки');
-    const [alignLabel, setAlignLabel] = useState('Выравн.');
-    const [headingLabel, setHeadingLabel] = useState('H1');
+    const [listLabel, setListLabel] = useState(<span><FaListUl /></span>);
+    const [alignLabel, setAlignLabel] = useState(<span><FaAlignLeft /></span>);
+    const [headingLabel, setHeadingLabel] = useState(<span><LuHeading /></span>);
+    const [pagesContent, setPagesContent] = useState<{ [id: number]: string }>({});
+    const [columnsLabel, setColumnsLabel] = useState(<span><TbColumns /></span>);
 
     
     
@@ -84,17 +93,15 @@ export default function LongreadEditorPage() {
             
         ],
         
-        //content: '<p>Начните редактировать контент...</p>',
     });
-    const [columnsLabel, setColumnsLabel] = useState('Колонки');
 
     useEffect(() => {
         if (!editor) return;
 
         const updateColumnsLabel = () => {
-            if (editor.isActive('columns', { count: 2 })) return setColumnsLabel('2 колонки');
-            if (editor.isActive('columns', { count: 3 })) return setColumnsLabel('3 колонки');
-            setColumnsLabel('Колонки');
+            if (editor.isActive('columns', { count: 2 })) return setColumnsLabel(<span><TbColumns2 /></span>);
+            if (editor.isActive('columns', { count: 3 })) return setColumnsLabel(<span><TbColumns3 /></span>);
+            setColumnsLabel(<span><TbColumns /></span>);
         };
 
         editor.on('selectionUpdate', updateColumnsLabel);
@@ -110,13 +117,13 @@ export default function LongreadEditorPage() {
         if (!editor) return;
 
         const updateHeadingLabel = () => {
-            for (let level = 1; level <= 6; level++) {
-                if (editor.isActive('heading', { level })) {
-                    setHeadingLabel(`H${level}`);
-                    return;
-                }
-            }
-            setHeadingLabel('Текст');
+            if (editor.isActive('heading', {level: 1})) return setHeadingLabel(<span><LuHeading1 /></span>);
+            if (editor.isActive('heading', {level: 2})) return setHeadingLabel(<span><LuHeading2 /></span>);
+            if (editor.isActive('heading', {level: 3})) return setHeadingLabel(<span><LuHeading3 /></span>);
+            if (editor.isActive('heading', {level: 4})) return setHeadingLabel(<span><LuHeading4 /></span>);
+            if (editor.isActive('heading', {level: 5})) return setHeadingLabel(<span><LuHeading5 /></span>);
+            if (editor.isActive('heading', {level: 6})) return setHeadingLabel(<span><LuHeading6 /></span>); 
+            setHeadingLabel(<span><LuHeading /></span>);
         };
 
         editor.on('selectionUpdate', updateHeadingLabel);
@@ -132,10 +139,10 @@ export default function LongreadEditorPage() {
         if (!editor) return;
 
         const updateListLabel = () => {
-            if (editor.isActive('taskList')) return setListLabel('Задачи');
-            if (editor.isActive('bulletList')) return setListLabel('Маркированный');
-            if (editor.isActive('orderedList')) return setListLabel('Нумерованный');
-            setListLabel('Списки');
+            if (editor.isActive('taskList')) return setListLabel(<span><FaTasks /></span>);
+            if (editor.isActive('bulletList')) return setListLabel(<span><FaListUl /></span>);
+            if (editor.isActive('orderedList')) return setListLabel(<span><FaListOl /></span>);
+            setListLabel(<span><FaListUl /></span>);
         };
 
         editor.on('selectionUpdate', updateListLabel);
@@ -154,12 +161,12 @@ export default function LongreadEditorPage() {
             for (const align of style) {
                 if (editor.isActive({ textAlign: align })) {
                     setAlignLabel(
-                        align === 'left' ? 'Слева' : align === 'center' ? 'По центру' : 'Справа'
+                        align === 'left' ? (<span><FaAlignLeft /></span>) : align === 'center' ? <span><FaAlignCenter /></span> : <span><FaAlignRight /></span>
                     );
                     return;
                 }
             }
-            setAlignLabel('Слева');
+            setAlignLabel(<span><FaAlignLeft /></span>);
         };
 
         editor.on('selectionUpdate', updateAlignLabel);
@@ -171,6 +178,20 @@ export default function LongreadEditorPage() {
         };
     }, [editor]);
 
+    useEffect(() => {
+        if (!editor) return;
+        const html = pagesContent[currentPage] || '';
+        editor.commands.setContent(html);
+    }, [currentPage, editor]);
+
+    const saveCurrentPage = () => {
+        if (!editor) return;
+        setPagesContent(prev => ({
+            ...prev,
+            [currentPage]: editor.getHTML(),
+        }));
+        console.log('Сохранено:', editor.getHTML()); // или сохранение в файл/сервер позже
+    };
 
 
     const isActive = (name: string, options: Record<string, any> = {}) =>
@@ -209,104 +230,108 @@ export default function LongreadEditorPage() {
                 <h1 className="mb-4 text-2xl font-bold">
                     Редактирование: {pages.find(p => p.id === currentPage)?.title}
                 </h1>
-
+                <button
+                    onClick={saveCurrentPage}
+                    className="rounded bg-gray-300 px-4 py-2 text-2xl hover:bg-gray-600">
+                    <FaRegSave /> 
+                </button>
                 {/* Закрепленное меню форматирования */}
                 {editor && (
                     <div className="sticky top-0 z-10 mb-4 flex flex-wrap gap-2 rounded-t-xl border-b border-gray-200 bg-white px-4 py-2 shadow-sm">
                         {/* Форматирование */}
-                        <div className="relative">   <button onClick={() => editor.chain().focus().toggleBold().run()} className={`px-3 py-1 border rounded hover:bg-gray-200 ${isActive('bold') ? 'bg-gray-200 border-gray-300 text-blue-800' : 'border-gray-300'}`}>Жирный</button>
+                        <div className="relative">   <button onClick={() => editor.chain().focus().toggleBold().run()} className={`px-3 py-1 border rounded hover:bg-gray-200 ${isActive('bold') ? 'bg-gray-200 border-gray-300 text-blue-800' : 'border-gray-300'}`}>
+                            <LuBold />
+                        </button>
                         </div>
                         <div className="relative">
-                            <button onClick={() => editor.chain().focus().toggleItalic().run()} className={`px-3 py-1 border rounded hover:bg-gray-200 ${isActive('italic') ? 'bg-gray-200 border-gray-300 text-blue-800' : 'border-gray-300'}`}>Курсив</button>
+                            <button onClick={() => editor.chain().focus().toggleItalic().run()} className={`px-3 py-1 border rounded hover:bg-gray-200 ${isActive('italic') ? 'bg-gray-200 border-gray-300 text-blue-800' : 'border-gray-300'}`}>
+                                <LuItalic />
+                            </button>
                         </div>
                         <div className="relative">
                             <button
                                 onClick={() => editor.chain().focus().toggleUnderline().run()}
-                                className={`px-3 py-1 border rounded hover:bg-gray-200 ${isActive('underline') ? 'bg-gray-200 border-gray-300 text-blue-800' : 'border-gray-300'}`}
-                            >
-                                Подчеркнутый
+                                className={`px-3 py-1 border rounded hover:bg-gray-200 ${isActive('underline') ? 'bg-gray-200 border-gray-300 text-blue-800' : 'border-gray-300'}`}>
+                                <LuUnderline />
                             </button>
                         </div>
                         <div className="relative">
                             <button
                                 onClick={() => editor.chain().focus().toggleStrike().run()}
-                                className={`px-3 py-1 border rounded hover:bg-gray-200 ${isActive('strike') ? 'bg-gray-200 border-gray-300 text-blue-800' : 'border-gray-300'}`}
-                            >
-                                Перечеркнутый
+                                className={`px-3 py-1 border rounded hover:bg-gray-200 ${isActive('strike') ? 'bg-gray-200 border-gray-300 text-blue-800' : 'border-gray-300'}`}>
+                                <LuStrikethrough />
                             </button>
                         </div>
                         <div className="relative">
                             <button
                                 onClick={() => editor.chain().focus().toggleCodeBlock().run()}
-                                className={`px-3 py-1 border rounded hover:bg-gray-200 ${isActive('codeBlock') ? 'bg-gray-200 border-gray-300 text-blue-800' : 'border-gray-300'}`}
-                            >
-                                Код
+                                className={`px-3 py-1 border rounded hover:bg-gray-200 ${isActive('codeBlock') ? 'bg-gray-200 border-gray-300 text-blue-800' : 'border-gray-300'}`}>
+                                <LuCodeXml />
                             </button>
                         </div>
                         <div className="relative">
                             <button
                                 onClick={() => editor.chain().focus().toggleBlockquote().run()}
-                                className={`px-3 py-1 border rounded hover:bg-gray-200 ${isActive('blockquote') ? 'bg-gray-200 border-gray-300 text-blue-800' : 'border-gray-300'}`}
-                            >
-                                Цитата
+                                className={`px-3 py-1 border rounded hover:bg-gray-200 ${isActive('blockquote') ? 'bg-gray-200 border-gray-300 text-blue-800' : 'border-gray-300'}`}>
+                                <LuMessageSquareQuote />
                             </button>
                         </div>
 
                         {/* Блоки */}
                         <div className="relative"> <button onClick={() => editor.chain().focus().setParagraph().run()}
                             className={`px-3 py-1 border rounded  transition hover:bg-gray-200 ${isActive('paragraph') ? 'bg-gray-200 border-gray-300 text-blue-800' : 'border-gray-300'}`}>
-                            Текст
+                            <RiText />
                         </button>
                         </div>
                         <ToolbarBubble
                             selectedLabel={headingLabel}
                             options={[
                                 {
-                                    label: 'H1',
+                                    label: (<span><LuHeading1 /></span>),
                                     value: '1',
                                     onClick: () => {
                                         editor.chain().focus().toggleHeading({ level: 1 }).run();
-                                        setHeadingLabel('H1');
+                                        setHeadingLabel(<span><LuHeading1 /></span>);
                                     },
                                 },
                                 {
-                                    label: 'H2',
+                                    label: (<span><LuHeading2 /></span>),
                                     value: '2',
                                     onClick: () => {
                                         editor.chain().focus().toggleHeading({ level: 2 }).run();
-                                        setHeadingLabel('H2');
+                                        setHeadingLabel(<span><LuHeading2 /></span>);
                                     },
                                 },
                                 {
-                                    label: 'H3',
+                                    label: (<span><LuHeading3 /></span>),
                                     value: '3',
                                     onClick: () => {
                                         editor.chain().focus().toggleHeading({ level: 3 }).run();
-                                        setHeadingLabel('H3');
+                                        setHeadingLabel(<span><LuHeading3 /></span>);
                                     },
                                 },
                                 {
-                                    label: 'H4',
+                                    label: (<span><LuHeading4 /></span>),
                                     value: '4',
                                     onClick: () => {
                                         editor.chain().focus().toggleHeading({ level: 4 }).run();
-                                        setHeadingLabel('H4');
+                                        setHeadingLabel(<span><LuHeading4 /></span>);
                                     },
                                 },
                                 {
-                                    label: 'H5',
+                                    label: (<span><LuHeading5 /></span>),
                                     value: '5',
                                     onClick: () => {
                                         editor.chain().focus().toggleHeading({ level: 5 }).run();
-                                        setHeadingLabel('H5');
+                                        setHeadingLabel(<span><LuHeading5 /></span>);
                                     },
                                 },
                                 {
-                                    label: 'H6',
+                                    label: (<span><LuHeading6 /></span>),
                                     value: '6',
                                     onClick: () => {
                                         editor.chain().focus().toggleHeading({ level: 6 }).run();
-                                        setHeadingLabel('H6');
+                                        setHeadingLabel(<span><LuHeading6 /></span>);
                                     },
                                 },
                             ]}
@@ -316,27 +341,27 @@ export default function LongreadEditorPage() {
                             selectedLabel={listLabel}
                             options={[
                                 {
-                                    label: '• Список',
+                                    label: (<span><FaListUl /></span> ),
                                     value: 'bulletList',
                                     onClick: () => {
                                         editor.chain().focus().toggleBulletList().run();
-                                        setListLabel('• Список');
+                                        setListLabel(<span><FaListUl /></span>);
                                     },
                                 },
                                 {
-                                    label: '1. Нумер.',
+                                    label: (<span><FaListOl /></span>),
                                     value: 'orderedList',
                                     onClick: () => {
                                         editor.chain().focus().toggleOrderedList().run();
-                                        setListLabel('1. Нумер.');
+                                        setListLabel(<span><FaListOl /></span>);
                                     },
                                 },
                                 {
-                                    label: '☑️ Задачи',
+                                    label: (<span><FaTasks /></span>), 
                                     value: 'taskList',
                                     onClick: () => {
                                         editor.chain().focus().toggleTaskList().run();
-                                        setListLabel('☑️ Задачи');
+                                        setListLabel(<span><FaTasks /></span>);
                                     },
                                 },
                             ]}
@@ -345,27 +370,27 @@ export default function LongreadEditorPage() {
                             selectedLabel={columnsLabel}
                             options={[
                                 {
-                                    label: '1 колонка',
+                                    label: (<span><TbColumns1 /></span>),
                                     value: '1',
                                     onClick: () => {
                                         editor.chain().focus().removeColumns().run();
-                                        setColumnsLabel('1 колонка');
+                                        setColumnsLabel(<span><TbColumns1 /></span>);
                                     },
                                 },
                                 {
-                                    label: '2 колонки',
+                                    label: (<span><TbColumns2 /></span>),
                                     value: '2',
                                     onClick: () => {
                                         editor.chain().focus().insertColumns(2).run();
-                                        setColumnsLabel('2 колонки');
+                                        setColumnsLabel(<span><TbColumns2 /></span>);
                                     },
                                 },
                                 {
-                                    label: '3 колонки',
+                                    label: (<span><TbColumns3 /></span>),
                                     value: '3',
                                     onClick: () => {
                                         editor.chain().focus().insertColumns(3).run();
-                                        setColumnsLabel('3 колонки');
+                                        setColumnsLabel(<span><TbColumns1 /></span>);
                                     },
                                 },
                             ]}
@@ -375,27 +400,27 @@ export default function LongreadEditorPage() {
                             selectedLabel={alignLabel}
                             options={[
                                 {
-                                    label: '⬅️ Лево',
+                                    label: (<span><FaAlignLeft /></span>),
                                     value: 'left',
                                     onClick: () => {
                                         editor.chain().focus().setTextAlign('left').run();
-                                        setAlignLabel('⬅️ Лево');
+                                        setAlignLabel(<span><FaAlignLeft /></span>);
                                     },
                                 },
                                 {
-                                    label: '↔️ Центр',
+                                    label: (<span><FaAlignCenter /></span>),
                                     value: 'center',
                                     onClick: () => {
                                         editor.chain().focus().setTextAlign('center').run();
-                                        setAlignLabel('↔️ Центр');
+                                        setAlignLabel(<span><FaAlignCenter /></span>);
                                     },
                                 },
                                 {
-                                    label: '➡️ Право',
+                                    label: (<span><FaAlignRight /></span>),
                                     value: 'right',
                                     onClick: () => {
                                         editor.chain().focus().setTextAlign('right').run();
-                                        setAlignLabel('➡️ Право');
+                                        setAlignLabel(<span><FaAlignRight /></span>);
                                     },
                                 },
                             ]}
@@ -412,7 +437,7 @@ export default function LongreadEditorPage() {
                                 }
                             }}
                                 className="px-3 py-1 border rounded border-gray-300 hover:bg-gray-200">
-                            Изображение
+                                <LuImage />
                         </button>
                         </div>
                     </div>

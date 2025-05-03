@@ -6,7 +6,7 @@ export const ICHeading = Heading.extend({
         const tag = `h${level}`;
 
         const tailwindSize = {
-            1: 'text-5xl ',
+            1: 'text-5xl',
             2: 'text-4xl',
             3: 'text-3xl',
             4: 'text-2xl',
@@ -14,6 +14,6 @@ export const ICHeading = Heading.extend({
             6: 'text-lg',
         }[level] || 'text-base';
 
-        return [tag, { ...HTMLAttributes, class: tailwindSize }, 0];
+        return [tag, { ...HTMLAttributes, class: tailwindSize+ " py-2" }, 0];
     },
 });

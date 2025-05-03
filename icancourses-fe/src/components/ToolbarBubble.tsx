@@ -1,15 +1,15 @@
 ﻿// === src/components/ToolbarBubble.tsx ================
 
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 interface Option {
-    label: string;
+    label: React.ReactNode | string;
     value: string;
     onClick: () => void;
 }
 
 interface Props {
-    selectedLabel: string;
+    selectedLabel: React.ReactNode | string;
     options: Option[];
 }
 
@@ -44,7 +44,7 @@ export default function ToolbarBubble({ selectedLabel, options }: Props) {
                                 opt.onClick();
                                 setOpen(false);
                             }}
-                            className="px-3 py-1 hover:bg-gray-100 border-gray-300 border-r last:border-r-0"
+                            className="px-4 py-2 hover:bg-gray-100 border-gray-300 border-r last:border-r-0"
                         >
                             {opt.label}
                         </button>

@@ -6,7 +6,7 @@ export const ICParagraph = Paragraph.extend({
         const baseClass = 'text-base leading-6 text-gray-800 text-wrap';
         const userClass = HTMLAttributes.class ?? '';
 
-        const isEmpty = node.content.size === 0;
+        //const isEmpty = node.content.size === 0;
         const hintClass = HTMLAttributes['data-exit-hint'] ? 'exit-hint' : '';
 
         const fullClass = [baseClass, userClass, hintClass].filter(Boolean).join(' ');
